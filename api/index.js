@@ -1,22 +1,9 @@
 const express = require("express");
-require('dotenv').config();
 const path = require("path");
 
 const app = express();
 
 app.use('/', express.static(path.join(__dirname, 'public')))
-
-const auth = process.env.AUTHENTICATION;
-
-async function db_get() {
-  console.log(auth)
-  return await (await fetch('https://normal-day-default-rtdb.firebaseio.com/.json', {
-    headers: {
-      'Authorization': 'Bearer ' + auth
-    }
-  })).json();
-}
-
 
 app.get("/LICENSE", async function(req, res){
   try {
@@ -30,12 +17,13 @@ app.get("/LICENSE", async function(req, res){
   }
 });
 
-app.get("/api", async function(req, res){
-  try {
-    res.status(200).json( {code: 400, message: await db_get(), test: null} );
+app.get("/data/:userid?", async function(req, res){
+  const userid = req.params['userid'];
+  if (!userid) {
+    res.json({ error: 400 });
   }
-  catch {
-    res.status(500).json( {code: 500, message: "Internal Server Error"} );
+  else {
+    res.json({ userid });
   }
 });
 
